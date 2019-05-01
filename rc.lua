@@ -21,6 +21,7 @@ local freedesktop   = require("freedesktop")
 local hotkeys_popup = require("awful.hotkeys_popup").widget
                       require("awful.hotkeys_popup.keys")
 local my_table      = awful.util.table or gears.table -- 4.{0,1} compatibility
+local dpi           = require("beautiful.xresources").apply_dpi
 -- }}}
 
 -- {{{ Error handling
@@ -30,13 +31,6 @@ if awesome.startup_errors then
     naughty.notify({ preset = naughty.config.presets.critical,
                      title = "Oops, there were errors during startup!",
                      text = awesome.startup_errors })
-end
-
-local quake = lain.util.quake()
--- quake terminal
-local quakeconsole = {}
-for s = 1, screen.count() do
-  quakeconsole[s] = lain.util.quake({ app = "gnome-terminal", argname = "--name %s" })
 end
 
 -- Handle runtime errors after startup
@@ -63,11 +57,8 @@ local function run_once(cmd_arr)
     end
 end
 
--- run_once({ "urxvtd", "unclutter -root" }) -- entries must be separated by commas
---os.execute("nm-applet")
---os.execute("setxkbmap -layout us,ru")
---os.execute("setxkbmap -option 'grp:shifts_toggle'")
---
+run_once({ "urxvtd", "unclutter -root" }) -- entries must be separated by commas
+
 -- This function implements the XDG autostart specification
 --[[
 awful.spawn.with_shell(
@@ -98,14 +89,15 @@ local themes = {
 local chosen_theme = themes[5]
 local modkey       = "Mod4"
 local altkey       = "Mod1"
-local terminal     = "gnome-terminal"
+local terminal     = "urxvt256c-ml"
 local editor       = os.getenv("EDITOR") or "vim"
+local gui_editor   = "emacs"
 local browser      = "firefox"
 local guieditor    = "emacs"
 local scrlocker    = "slock"
 
 awful.util.terminal = terminal
-awful.util.tagnames = { "1", "2", "3", "4", "5" }
+awful.util.tagnames = { "1", "2", "3", "4", "5", "6", "7", "8", "9" }
 awful.layout.layouts = {
     awful.layout.suit.floating,
     awful.layout.suit.tile,
@@ -176,7 +168,7 @@ awful.util.tasklist_buttons = my_table.join(
                 instance:hide()
                 instance = nil
             else
-                instance = awful.menu.clients({theme = {width = 250}})
+                instance = awful.menu.clients({theme = {width = dpi(250)}})
             end
         end
     end),
@@ -188,9 +180,9 @@ lain.layout.termfair.nmaster           = 3
 lain.layout.termfair.ncol              = 1
 lain.layout.termfair.center.nmaster    = 3
 lain.layout.termfair.center.ncol       = 1
-lain.layout.cascade.tile.offset_x      = 2
-lain.layout.cascade.tile.offset_y      = 32
-lain.layout.cascade.tile.extra_padding = 5
+lain.layout.cascade.tile.offset_x      = dpi(2)
+lain.layout.cascade.tile.offset_y      = dpi(32)
+lain.layout.cascade.tile.extra_padding = dpi(5)
 lain.layout.cascade.tile.nmaster       = 5
 lain.layout.cascade.tile.ncol          = 2
 
@@ -206,7 +198,7 @@ local myawesomemenu = {
     { "quit", function() awesome.quit() end }
 }
 awful.util.mymainmenu = freedesktop.menu.build({
-    icon_size = beautiful.menu_height or 16,
+    icon_size = beautiful.menu_height or dpi(16),
     before = {
         { "Awesome", myawesomemenu, beautiful.awesome_icon },
         -- other triads can be put here
@@ -235,12 +227,20 @@ screen.connect_signal("property::geometry", function(s)
         gears.wallpaper.maximized(wallpaper, s, true)
     end
 end)
--- Create a wibox for each screen and add it
-awful.screen.connect_for_each_screen(
-  function(s)
-    beautiful.at_screen_connect(s)
-    s.quake = lain.util.quake()
+
+-- No borders when rearranging only 1 non-floating or maximized client
+screen.connect_signal("arrange", function (s)
+    local only_one = #s.tiled_clients == 1
+    for _, c in pairs(s.clients) do
+        if only_one and not c.floating or c.maximized then
+            c.border_width = 0
+        else
+            c.border_width = beautiful.border_width
+        end
+    end
 end)
+-- Create a wibox for each screen and add it
+awful.screen.connect_for_each_screen(function(s) beautiful.at_screen_connect(s) end)
 -- }}}
 
 -- {{{ Mouse bindings
@@ -425,19 +425,19 @@ globalkeys = my_table.join(
               {description = "-10%", group = "hotkeys"}),
 
     -- ALSA volume control
-    awful.key({ altkey }, "Up",
+    awful.key({}, "XF86AudioRaiseVolume",
         function ()
             os.execute(string.format("amixer -q set %s 1%%+", beautiful.volume.channel))
             beautiful.volume.update()
         end,
         {description = "volume up", group = "hotkeys"}),
-    awful.key({ altkey }, "Down",
+    awful.key({ }, "XF86AudioLowerVolume",
         function ()
             os.execute(string.format("amixer -q set %s 1%%-", beautiful.volume.channel))
             beautiful.volume.update()
         end,
         {description = "volume down", group = "hotkeys"}),
-    awful.key({ altkey }, "m",
+    awful.key({ }, "XF86AudioMute",
         function ()
             os.execute(string.format("amixer -q set %s toggle", beautiful.volume.togglechannel or beautiful.volume.channel))
             beautiful.volume.update()
@@ -522,13 +522,15 @@ globalkeys = my_table.join(
     --]]
     -- alternatively use rofi, a dmenu-like application with more features
     -- check https://github.com/DaveDavenport/rofi for more details
-    -- [[ rofi
-    awful.key({ modkey }, "r", function ()
-            -- os.execute(string.format("rofi -show %s -theme %s", 'run', 'dmenu'))
-            os.execute("rofi -modi run,drun -show combi")
+    --[[ rofi
+    awful.key({ modkey }, "x", function ()
+            os.execute(string.format("rofi -show %s -theme %s",
+            'run', 'dmenu'))
         end,
         {description = "show rofi", group = "launcher"}),
     --]]
+    awful.key({ modkey }, "r", function () os.execute("rofi -modi run,drun -show combi") end,
+              {description = "run prompt", group = "launcher"}),
     --[[ Prompt
     awful.key({ modkey }, "r", function () awful.screen.focused().mypromptbox:run() end,
               {description = "run prompt", group = "launcher"}),
@@ -723,7 +725,7 @@ client.connect_signal("request::titlebars", function(c)
         end)
     )
 
-    awful.titlebar(c, {size = 16}) : setup {
+    awful.titlebar(c, {size = dpi(16)}) : setup {
         { -- Left
             awful.titlebar.widget.iconwidget(c),
             buttons = buttons,
@@ -754,18 +756,7 @@ client.connect_signal("mouse::enter", function(c)
     c:emit_signal("request::activate", "mouse_enter", {raise = true})
 end)
 
--- No border for maximized clients
-function border_adjust(c)
-    if c.maximized then -- no borders if only 1 client visible
-        c.border_width = 0
-    elseif #awful.screen.focused().clients > 1 then
-        c.border_width = beautiful.border_width
-        c.border_color = beautiful.border_focus
-    end
-end
-
-client.connect_signal("property::maximized", border_adjust)
-client.connect_signal("focus", border_adjust)
+client.connect_signal("focus", function(c) c.border_color = beautiful.border_focus end)
 client.connect_signal("unfocus", function(c) c.border_color = beautiful.border_normal end)
 
 -- possible workaround for tag preservation when switching back to default screen:
