@@ -419,10 +419,16 @@ globalkeys = my_table.join(
               {description = "show weather", group = "widgets"}),
 
     -- Brightness
-    awful.key({ }, "XF86MonBrightnessUp", function () os.execute("xbacklight -inc 10") end,
+    awful.key({ }, "XF86MonBrightnessUp", function () os.execute("brightnessctl -d gmux_backlight s 10+%") end,
               {description = "+10%", group = "hotkeys"}),
-    awful.key({ }, "XF86MonBrightnessDown", function () os.execute("xbacklight -dec 10") end,
+    awful.key({ }, "XF86MonBrightnessDown", function () os.execute("brightnessctl -d gmux_backlight s 10-%") end,
               {description = "-10%", group = "hotkeys"}),
+
+    awful.key({ }, "XF86KbdBrightnessUp", function () os.execute("brightnessctl -d smc::kbd_backlight s 10+%") end,
+              {description = "+10%", group = "hotkeys"}),
+    awful.key({ }, "XF86KbdBrightnessDown", function () os.execute("brightnessctl -d smc::kbd_backlight s 10-%") end,
+              {description = "-10%", group = "hotkeys"}),
+
 
     -- ALSA volume control
     awful.key({}, "XF86AudioRaiseVolume",
