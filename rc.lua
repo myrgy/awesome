@@ -69,6 +69,9 @@ awful.spawn.with_shell(
 )
 --]]
 
+os.execute("nm-applet &")
+os.execute("setxkbmap -option 'grp:shifts_toggle' -layout us,ru")
+
 -- }}}
 
 -- {{{ Variable definitions

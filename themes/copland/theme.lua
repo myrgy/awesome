@@ -334,6 +334,7 @@ function theme.at_screen_connect(s)
     -- Create the wibox
     s.mywibox = awful.wibar({ position = "top", screen = s, height = dpi(18), bg = theme.bg_normal, fg = theme.fg_normal })
 
+    s.mykbdlayout = awful.widget.keyboardlayout:new()
     -- Add widgets to the wibox
     s.mywibox:setup {
         layout = wibox.layout.align.horizontal,
@@ -364,6 +365,7 @@ function theme.at_screen_connect(s)
             volicon,
             volumewidget,
             bar_spr,
+            s.mykbdlayout,
             mytextclock,
         },
     }
