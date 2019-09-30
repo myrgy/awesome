@@ -202,7 +202,7 @@ local batbg = wibox.container.background(batbar, "#474747", gears.shape.rectangl
 local batwidget = wibox.container.margin(batbg, dpi(2), dpi(7), dpi(4), dpi(4))
 
 -- /home fs
--- [[ commented because it needs Gio/Glib >= 2.54
+--[[ commented because it needs Gio/Glib >= 2.54
 local fsicon = wibox.widget.imagebox(theme.disk)
 local fsbar = wibox.widget {
     forced_height    = dpi(1),
@@ -331,10 +331,11 @@ function theme.at_screen_connect(s)
     -- Create a tasklist widget
     s.mytasklist = awful.widget.tasklist(s, awful.widget.tasklist.filter.currenttags, awful.util.tasklist_buttons)
 
+    s.mykdblayout = awful.widget.keyboardlayout:new()
+
     -- Create the wibox
     s.mywibox = awful.wibar({ position = "top", screen = s, height = dpi(18), bg = theme.bg_normal, fg = theme.fg_normal })
 
-    s.mykbdlayout = awful.widget.keyboardlayout:new()
     -- Add widgets to the wibox
     s.mywibox:setup {
         layout = wibox.layout.align.horizontal,
@@ -365,7 +366,8 @@ function theme.at_screen_connect(s)
             volicon,
             volumewidget,
             bar_spr,
-            s.mykbdlayout,
+            s.mykdblayout,
+            bar_spr,
             mytextclock,
         },
     }

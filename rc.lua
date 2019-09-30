@@ -57,7 +57,7 @@ local function run_once(cmd_arr)
     end
 end
 
-run_once({ "urxvtd", "unclutter -root" }) -- entries must be separated by commas
+-- run_once({ "urxvtd", "unclutter -root" }) -- entries must be separated by commas
 
 -- This function implements the XDG autostart specification
 --[[
@@ -92,7 +92,7 @@ local themes = {
 local chosen_theme = themes[2]
 local modkey       = "Mod4"
 local altkey       = "Mod1"
-local terminal     = "urxvt256c-ml"
+local terminal     = "kitty"
 local editor       = os.getenv("EDITOR") or "vim"
 local gui_editor   = "emacs"
 local browser      = "firefox"
