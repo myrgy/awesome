@@ -202,7 +202,7 @@ local batbg = wibox.container.background(batbar, "#474747", gears.shape.rectangl
 local batwidget = wibox.container.margin(batbg, dpi(2), dpi(7), dpi(4), dpi(4))
 
 -- /home fs
---[[ commented because it needs Gio/Glib >= 2.54
+-- [[ commented because it needs Gio/Glib >= 2.54
 local fsicon = wibox.widget.imagebox(theme.disk)
 local fsbar = wibox.widget {
     forced_height    = dpi(1),
@@ -360,8 +360,8 @@ function theme.at_screen_connect(s)
             baticon,
             batwidget,
             bar_spr,
-            --fsicon,
-            --fswidget,
+            fsicon,
+            fswidget,
             bar_spr,
             volicon,
             volumewidget,
