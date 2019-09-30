@@ -57,8 +57,6 @@ local function run_once(cmd_arr)
     end
 end
 
--- run_once({ "urxvtd", "unclutter -root" }) -- entries must be separated by commas
-
 -- This function implements the XDG autostart specification
 --[[
 awful.spawn.with_shell(
@@ -70,6 +68,7 @@ awful.spawn.with_shell(
 --]]
 
 os.execute("nm-applet &")
+os.execute("slack &")
 os.execute("setxkbmap -option 'grp:shifts_toggle' -layout us,ru")
 
 -- }}}
