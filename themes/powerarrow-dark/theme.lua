@@ -241,15 +241,25 @@ theme.volume = lain.widget.alsa({
         widget:set_markup(markup.font(theme.font, " " .. volume_now.level .. "% "))
     end
 })
+theme.volume.widget:buttons(awful.util.table.join(
+                               awful.button({}, 4, function ()
+                                     awful.util.spawn("amixer set Master 1%+")
+                                     theme.volume.update()
+                               end),
+                               awful.button({}, 5, function ()
+                                     awful.util.spawn("amixer set Master 1%-")
+                                     theme.volume.update()
+                               end)
+))
 
 -- Net
 local neticon = wibox.widget.imagebox(theme.widget_net)
 local net = lain.widget.net({
     settings = function()
         widget:set_markup(markup.font(theme.font,
-                          markup("#7AC82E", " " .. net_now.received)
+                          markup("#7AC82E", " " .. string.format("%06.1f", net_now.received))
                           .. " " ..
-                          markup("#46A8C3", " " .. net_now.sent .. " ")))
+                          markup("#46A8C3", " " .. string.format("%06.1f", net_now.sent) .. " ")))
     end
 })
 
